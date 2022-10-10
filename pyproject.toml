@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "mldev"
+version = "0.1.0"
+description = "Source code for projects I am doing in the process of learning ML"
+authors = ["Vaibhav Verma"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^1.23.3"
+fastai = "^2.7.9"
+scikit-learn = "^1.1.2"
+torch = "^1.12.1"
+ipywidgets = "^8.0.2"
+
+
+[tool.poetry.group.dev.dependencies]
+jupyterlab = "^3.4.8"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -275,7 +275,7 @@ Another similarity between the two implementations is that the hidden layer weig
 
 #### Regularization as a form of smoothing
 
-The frequency based bigram solution gets infinite loss whenever it encounters a bigram it has not seen in the training set, because it gets back a likelihood of 0, and `$\log 0 = -\inf`.
+The frequency based bigram solution gets infinite loss whenever it encounters a bigram it has not seen in the training set, because it gets back a likelihood of 0, and $\log 0 = -\infty$.
 
 To fix this problem, we initialize each bigram with a frequency of 1. Making the initial frequency larger than 1 makes the model more uniform. The larger the initial frequency, the less that our results depend on the input corpus.
 

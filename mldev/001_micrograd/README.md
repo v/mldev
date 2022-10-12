@@ -44,18 +44,22 @@ Given that the definition of a derivative is as follows:
 
 $$ f'(x) = \lim_{h\to0} \frac{f(x + h) - f(x)}{h}  $$
 
-one can compute a derivate numerically as follows:
+you can compute a derivate numerically in Python:
 
 ```python
 
 def f(x):
     # implementation of f goes here
-    ...
+    # ...
+
+    # example:
+    return x ** 3 + 3 * (x ** 2) / 10
 
 h = 0.000001
 x = 10
 
-df_dx_at_10 = (f(x + h) - f(x)) / h
+# f'(10)
+print((f(x + h) - f(x)) / h)
 ```
 
 ### Visualizing the network

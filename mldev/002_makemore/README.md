@@ -280,3 +280,80 @@ The frequency based bigram solution gets infinite loss whenever it encounters a 
 To fix this problem, we initialize each bigram with a frequency of 1. Making the initial frequency larger than 1 makes the model more uniform. The larger the initial frequency, the less that our results depend on the input corpus.
 
 In the neural network based solution, we can get a similar smoothing effect by nudging our weights towards 0. The closer our weights are to 0, the more uniform the model's outputs will be. This is also known as a regularization term, and it's neat that there's a similarity in behavior with the frequency based solution.
+
+
+## Trigram Exercise
+
+### Reimplementation of Bigram
+
+Before doing the trigram exercise, I wanted to reimplement the bigram myself, because I expected a trigram to be a simple change on top of the bigram.
+
+On my first attempt implementing bigram, my neural network was outputting garbage like this:
+
+```
+qvsabyuaynqlzowuzmhvbkrmluccraoe
+qniwqszazohbsccnerejbdieukejdjkpqjroglegbzukr
+ldew
+cbijyodikjheqvktoffoqfo
+dibebbithrpld
+xpwvcijdkqupyfgwedxfumlkdmdkuyqgvxlrldkoprqcuouthepuegqvfgetqwxhtrazsqpecazbgblwhjaqgbniklrngdjaunckx
+htynybzjdifgkbkfxzqvkoxrqrtduazazoechxrnglznxfordiorhggftcckkogbwccheumiffvfjrassrarumbezxghtq
+metpdqfgqncblecbsstheci
+cchiswdphcmlfufqyfoazmdjdiwenyjdbccifdmlxdru
+enzxnqtpdiwhcbkegpumbxnyneecgbbl
+atwlomiusjbkdrazayefpijdzotdapsvwtphumimlefvucbgbzprpqaqdkuswpuqaqjtdkkjiyeh
+sjdfgqiehebxccskmithxtquvkxhtuxgbmycrucrweublncfecieoheqmiejayfowu
+```
+
+I was stuck on this for a while. I initially thought the problem was with the input text file. So I tried a list of pokemon names, because I expected those to be simpler. That didn't work either, so I switched to the original list of names from the lecture.
+
+When I saw that this code didn't work, I knew that something was wrong with my network. 
+
+It turned out that the bug was something like this:
+
+```diff
+# logits is a 5x27 tensor output from the neural network
+-probs = logits.softmax(dim=0)
++probs = logits.softmax(dim=1)
+```
+
+In my head, I was trying to take the softmax across each row. I index into rows using the first dimension (e.g. `logits[0]` is the first row, `logits[1]` is the second row). So I figured I would take the softmax across all the rows like so: `logits.softmax(dim=0)`. I'm asking Pytorch to take a softmax across dimension 0.
+
+It turns out that my mental model here is wrong.
+
+The same bug would occur if I were taking a `sum` of a tensor.
+#### dim parameter in pytorch functions is counterintuitive
+
+Consider this code:
+
+```python
+a = torch.tensor([
+    [1, 2, 3],
+    [4, 5, 6],
+])
+
+print(a.sum(dim=0))
+# what do you think this will print?
+```
+
+You might think, the 0th dimension refers to rows. So this should add up each row and print `[6, 15]`
+
+Unfortunately, this is wrong. The code will print [5, 7, 9]`.
+
+Why is this?
+
+Pytorch interprets the `dim` parameter as the parameter that is going to get *collapsed*.
+
+So when a dimension of `0` is supplied it means that the 0th dimension is going to get collapsed, and we'll sum up over the other dimensions (in the case of a 2d tensor, we'll take a column sum).
+
+With 2D tensors, it's not really clear why Pytorch chose this interpretation of the `dim` parameter, but it becomes more obvious with 3d tensors.
+
+There's a handy visualization and explanation of 3d tensors and the `dim` parameter in [this blog post](https://towardsdatascience.com/understanding-dimensions-in-pytorch-6edf9972d3be).
+
+Here's another way to correct your mental model.
+
+`a.sum(dim=0)` is taking a sum over the first dimension, so the result will be: `a[0] + a[1] + a[2] + ...`
+
+`a.sum(dim=1)` is taking a sum over the second dimension, so the result will be: `a[:, 0] + a[:, 1] + a[:, 2] + ...`
+
+I hope this explanation helps you avoid this bug in your own code.

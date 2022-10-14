@@ -338,7 +338,7 @@ print(a.sum(dim=0))
 
 You might think, the 0th dimension refers to rows. So this should add up each row and print `[6, 15]`
 
-Unfortunately, this is wrong. The code will print [5, 7, 9]`.
+Unfortunately, this is wrong. The code will print `[5, 7, 9]`.
 
 Why is this?
 

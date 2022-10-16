@@ -357,3 +357,49 @@ Here's another way to correct your mental model.
 `a.sum(dim=1)` is taking a sum over the second dimension, so the result will be: `a[:, 0] + a[:, 1] + a[:, 2] + ...`
 
 I hope this explanation helps you avoid this bug in your own code.
+### Converting bigram to trigram
+
+Bigram was pretty easy to convert to trigram.
+
+The neural network changes slightly where instead of taking in a tensor of length 27, we take a tensor of length 27 * 27.
+
+The output of the network is still 27 neurons (one for each letter).
+
+I had to write a little bit of code to translate 2 alphabet indexes into one index
+
+```python
+letters = '.' + ''.join(sorted(set(''.join(names))))
+num_letters = len(letters)
+
+def index_2d_to_1d(ix1: int, ix2: int):
+    return ix1 * num_letters + ix2
+
+def index_1d_to_2d(ix: int) -> Tuple[int, int]:
+    return ix // num_letters, ix % num_letters
+
+# this is the index for the input 'ac' and it equals 30 when we have 27 letters
+index_2d_to_1d(1, 2) 
+```
+
+Other than that, I also made the suggested changes to the neural network implementation:
+
+- switched from one-hot vectors to indexing the weights, which is less verbose and less finnicky.
+
+```diff
+- xenc = F.one_hot(Xtr, num_classes=num_letters).float()
+- logits = xenc @ W
++ logits = W[Xtr]
+```
+
+- switched the softmax + log loss calculation to using `F.cross_entropy()`, which is a lot more readable:
+
+```diff
+- probs = logits.softmax(dim=1)
+- ypred = probs[torch.arange(len(ys)), ys]
+- loss = -(ypred.log().mean())
++ loss = F.cross_entropy(logits, Ydev)
+```
+
+- started using minibatches to train instead of training on the full dataset, which makes the network train a lot faster.
+
+- experimented with hyperparameter tuning like finding a learning rate and a regularization value. These tuning methods seem pretty manual to me, and it feels like I'm mostly writing loops and plotting graphs to figure out which values to pick.

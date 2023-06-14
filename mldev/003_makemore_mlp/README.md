@@ -122,12 +122,12 @@ Our datasets are ready.
 Let’s train the multi layer perceptron and evaluate the network.
 
 ``` python
-batch_size = 6
+batch_size = 32
 
 # changed these parameters 10 times to achieve the best loss on the dev set
-training_iter = 300000
-word_embedding_size = 8
-hidden_layer_size = 180
+training_iter = 200000
+word_embedding_size = 64
+hidden_layer_size = 64
 
 class MLP:
     """MLP refers to a multi layer perception model
@@ -210,7 +210,7 @@ We are trying to beat a loss of 2.2 from the lecture.
 print(F.cross_entropy(m(Xdev), Ydev))
 ```
 
-    tensor(2.1850, grad_fn=<NllLossBackward0>)
+    tensor(2.1405, grad_fn=<NllLossBackward0>)
 
 We beat it just barely.
 
@@ -226,7 +226,7 @@ Let’s check our test set loss for sanity.
 print(F.cross_entropy(m(Xtest), Ytest))
 ```
 
-    tensor(2.1846, grad_fn=<NllLossBackward0>)
+    tensor(2.1387, grad_fn=<NllLossBackward0>)
 
 Test loss is pretty close to dev loss. This is good because it means
 that our dev set performance is generalizing on the test set too.
